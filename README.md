@@ -48,7 +48,6 @@ Match Group fileshare
     AllowTcpForwarding no
     PermitTunnel no
     PasswordAuthentication no
-    PubkeyAuthentication yes
 ```
 
 Prepare chroot layout (required ownership model):
@@ -151,7 +150,7 @@ High-level relayd design:
 From a VPN-connected client:
 
 ```sh
-sftp -P 22 alice@10.20.0.1
+sftp alice@10.20.0.1
 ```
 
 If mTLS HTTPS is enabled:
