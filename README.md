@@ -47,6 +47,7 @@ Match Group fileshare
     X11Forwarding no
     AllowTcpForwarding no
     PermitTunnel no
+    # Enable only after authorized_keys is in place for every share user.
     PasswordAuthentication no
 ```
 
@@ -92,6 +93,7 @@ Minimal `/etc/iked.conf` skeleton (replace with your certs/subnets):
 # Define certificate and trust settings (certpath/CA) per iked.conf(5).
 # Example: set cert "/etc/iked/certs/vpn.example.com.fullchain.pem"
 #          set key  "/etc/iked/private/vpn.example.com.key"
+#          ca "/etc/iked/ca/ca.crt"
 # This sample limits VPN clients to SFTP on the server IP (10.20.0.1).
 # Expand 'to' for broader access (for example, to internal LAN prefixes).
 ikev2 "roadwarrior" passive esp \
@@ -111,6 +113,8 @@ wan_if = "egress"
 block all
 pass out quick on $wan_if inet from ($wan_if)
 pass in on $wan_if proto udp to ($wan_if) port {500,4500}   # IKEv2/IPsec
+# Optional: allow admin SSH from fixed public source(s) before VPN is up.
+# pass in on $wan_if proto tcp from 198.51.100.10 to ($wan_if) port 22
 pass in on $vpn_if proto tcp from 10.20.0.0/24 to 10.20.0.1 port 22
 ```
 
@@ -119,6 +123,7 @@ Enable services:
 ```sh
 doas rcctl enable iked pf sshd
 doas rcctl restart iked
+doas pfctl -nf /etc/pf.conf
 doas pfctl -f /etc/pf.conf && doas pfctl -e
 ```
 
