@@ -14,7 +14,7 @@ Use **built-in SFTP (`sshd`)** for file sharing and put it behind a **built-in V
 
 ```sh
 doas syspatch
-#doas pkg_add -u   # optional for installed packages
+doas pkg_add -u   # optional: update installed packages
 ```
 
 Create a storage area and group:
@@ -92,6 +92,8 @@ Minimal `/etc/iked.conf` skeleton (replace with your certs/subnets):
 # Define certificate and trust settings (certpath/CA) per iked.conf(5).
 # Example: set cert "/etc/iked/certs/vpn.example.com.fullchain.pem"
 #          set key  "/etc/iked/private/vpn.example.com.key"
+# This sample limits VPN clients to SFTP on the server IP (10.20.0.1).
+# Expand 'to' for broader access (for example, to internal LAN prefixes).
 ikev2 "roadwarrior" passive esp \
     from 10.20.0.0/24 to 10.20.0.1/32 \
     peer any \
@@ -139,6 +141,7 @@ High-level relayd design:
 ## 6) Hardening checklist
 
 - Disable password auth for share users (`PasswordAuthentication no` in `Match Group fileshare`)
+- After validating key-based admin access, disable global SSH password auth too
 - Use per-user SSH keys; rotate keys regularly
 - Keep OpenBSD updated (`syspatch`)
 - Limit exposed ports with `pf`
